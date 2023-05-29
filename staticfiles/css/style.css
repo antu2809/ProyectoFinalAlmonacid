@@ -1,0 +1,84 @@
+@font-face {
+    font-family: 'Orbitron-VariableFont_wght';
+
+    src: url('/static/fonts/Orbitron-VariableFont_wght.ttf') format('truetype');
+}
+
+body {
+    background-color: rgb(15, 15, 15);
+    text-shadow: none !important;
+    font-family: 'Orbitron-VariableFont_wght', sans-serif;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 3.5rem;
+    margin-top: 3rem;
+}
+
+h2 {
+    font-size: 2.5rem;
+    margin-top: 2rem;
+}
+
+h3 {
+    font-size: 2rem;
+    margin-top: 1.5rem;
+}
+
+.video-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.video-container video {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.gif-container {
+    position: fixed;
+    top: 50%;
+    left: 30%;
+    transform: translate(-50%, -50%) translateZ(0);
+}
+
+.center-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+.btn-tienda {
+    padding: 10px 20px;
+    background-color: #ff7f50;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+  
+.btn-tienda:hover {
+    background-color: #ff6347;
+  }

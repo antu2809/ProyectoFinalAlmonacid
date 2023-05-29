@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=0.9">
+    <meta charset="utf-8">
+    <title>Combined View</title>
+    <style>
+        html,
+        body {
+            background-image: url("{% url 'show_gif' %}");
+            background-size: cover;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        .box {
+            border: 2px solid transparent;
+            padding: 5px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .box:last-child {
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .artwork-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        img {
+            max-width: 40%;
+            max-height: 40%;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .gif-container {
+            position: fixed;
+            top: 50%;
+            left: 30%;
+            transform: translate(-10%, -50%) translateZ(0);
+        }
+
+        /* Estilos para el carrito */
+        .carrito-container {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .carrito-container h1,
+        .carrito-container h2 {
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .carrito-container p {
+            margin: 5px 0;
+        }
+
+        .carrito-container a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .carrito-container h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box">
+            {{ saludo_html|safe }}
+        </div>
+        <a href="{% url 'tienda' %}" class="btn-tienda">tienda</a>
+        <div class="box">
+            <h2 class="title">Galería</h2>
+            <h2 class="title">"Las Hijas"</h2>
+            <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
+            <p>la lola en pan bimbo y la mona estirada</p>
+            <div class="artwork">
+                <h2>{{ artwork.title }}</h2>
+                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
+                <p>{{ artwork.description }}</p>
+                <p>Artista: Kai</p>
+                <p>Año:2023 </p>
+                <p>Precio: USD $1.000.000</p>
+                <form method="POST" action="{% url 'realizar_compra' %}">
+                    {% csrf_token %} 
+                    <input type="hidden" name="artwork_id" value="{{ artwork.id }}">
+                    <input type="number" name="cantidad" min="1" value="1" required>
+                    <a href="{% url 'carrito' %}">Comprar</a>
+                </form>
+            </div>
+        </div>
+        <div class="instagram-info">
+            <h2>Instagram</h2>
+            <h1><a href='https://www.instagram.com/kai.orosco/'>Sígueme en Instagram</a></h1>
+            <p>{{ instagram_info }}</p> <!-- Contenido de Instagram -->
+        </div>
+        <div id="video-container">
+            <video autoplay loop muted>
+                <source src="{% static 'gifkai.gif' %}" type="video/gif">
+            </video>
+        </div>
+        <form method="POST" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Buscar</button>
+        </form>
+        {% if search_results %}
+            <h3>Resultados de la búsqueda:</h3>
+            <ul>
+                {% for artwork in search_results %}
+                    <li>{{ artwork.title }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</body>
+ </html>

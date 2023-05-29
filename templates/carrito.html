@@ -1,0 +1,115 @@
+{% load static %}
+
+<style>
+    html,
+    body {
+        background-image: url("{% url 'show_gif' %}");
+        background-size: cover;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .video-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .video-container video {
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        transform: translate(-50%, -50%);
+        min-width: 100%;
+        min-height: 100%;
+    }
+
+    .gif-container {
+        position: fixed;
+        top: 50%;
+        left: 30%;
+        transform: translate(-10%, -50%) translateZ(0);
+    }
+
+    .artwork {
+        margin-bottom: 20px;
+    }
+
+    .artwork img {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+    }
+
+    .artwork h2 {
+        font-size: 24px;
+        margin-top: 10px;
+    }
+
+    .artwork p {
+        margin: 5px 0;
+    }
+
+    .artwork form {
+        margin-top: 10px;
+    }
+
+    .carrito-container {
+        background-color: rgba(255, 255, 255, 0); /* Fondo transparente */
+        padding: 20px;
+        border: none;
+        color: rgb(33, 31, 35);
+        z-index: 0; /* Z-index menor */
+    }
+
+    .carrito-container h1,
+    .carrito-container h2 {
+        font-size: 24px;
+        margin-top: 0;
+    }
+
+    .carrito-container p {
+        margin: 5px 0;
+    }
+
+    .carrito-container a {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .carrito-container h3 {
+        font-size: 18px;
+        margin-top: 15px;
+        margin-bottom: 5px;
+    }
+</style>
+
+<div id="video-container">
+    <video autoplay loop muted>
+        <source src="{% static 'gifkai.gif' %}" type="video/gif">
+    </video>
+</div>
+
+<div class="carrito-container">
+    <h1>Carrito de compras</h1>
+    <div class="artwork">
+        <h2>{{ "Las Hijas" }}</h2>
+        <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
+        <p>Precio: ${{ 1.000.000 }}</p>
+        <p>Cantidad: {{ cantidad }}</p>
+        <a href="#">Quitar del carrito</a>
+    </div>
+    {% if 1.000.000 > 10000 %}
+    <p>Envío gratis en pedidos nacionales que superen los $10.000</p>
+    {% endif %}
+    <h3>Subtotal</h3>
+    <p>${{ 1.000.000 }}</p>
+    <h3>Total (incl. IVA)</h3>
+    <p>${{ 1000000 }}</p>
+    <button type="submit">Confirmar compra</button>
+</div>
