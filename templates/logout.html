@@ -1,0 +1,17 @@
+{% extends 'combined.html' %}
+
+{% block content %}
+    <h2 class="title">Lista de Blogs</h2>
+    <ul>
+        {% for blog in blogs %}
+            <li>{{ blog.title }}</li>
+            <p>{{ blog.content }}</p>
+        {% endfor %}
+    </ul>
+
+    <div>
+        <h2>Cerrar sesión</h2>
+        <p>Cerrar la sesión del usuario y redirigir a la página de inicio de sesión</p>
+        <a href="{% url 'logout_view' %}">Cerrar sesión</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'combined.html' %}
+
+{% block content %}
+    <h2 class="title">Lo sentimos, la página que buscas no existe.</h2>
+    <p>{{ message }}</p>
+    <p>Si necesitas ayuda, por favor contacta a nuestro equipo de soporte en el siguiente correo electrónico: <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+{% endblock %}

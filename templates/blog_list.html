@@ -1,11 +1,9 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=0.9">
-    <meta charset="utf-8">
+    
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <title>Combined View</title>
     <style>
         html,
         body {
@@ -108,58 +106,15 @@
             margin-bottom: 5px;
         }
     </style>
+    <title>{{ title }}</title>
 </head>
 <body>
-    <div class="container">
-        <div class="box">
-            {{ saludo_html|safe }}
-        </div>
-        <div class="box">
-            <h2 class="title">Galería</h2>
-            <h2 class="title">"Las Hijas"</h2>
-            <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
-            <p>la lola en pan bimbo y la mona estirada</p>
-            <div class="artwork">
-                <h2>{{ artwork.title }}</h2>
-                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
-                <p>{{ artwork.description }}</p>
-                <p>Artista: Kai</p>
-                <p>Año:2023 </p>
-                <p>Precio: USD $1.000.000</p>
-                <form method="POST" action="{% url 'realizar_compra' %}">
-                    {% csrf_token %} 
-                    <input type="hidden" name="artwork_id" value="{{ artwork.id }}">
-                    <input type="number" name="cantidad" min="1" value="1" required>
-                    <a href="{% url 'carrito' %}">Comprar</a>
-                </form>
-            </div>
-        </div>
-        <div class="instagram-info">
-            <h2>Instagram</h2>
-            <h1><a href='https://www.instagram.com/kai.orosco/'>Sígueme en Instagram</a></h1>
-            <p>{{ instagram_info }}</p> <!-- Contenido de Instagram -->
-        </div>
-        <div id="video-container">
-            <video autoplay loop muted>
-                <source src="{% static 'gifkai.gif' %}" type="video/gif">
-            </video>
-        </div>
-        <form method="POST" action="">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Buscar</button>
-        </form>
-        {% if search_results %}
-            <h3>Resultados de la búsqueda:</h3>
-            <ul>
-                {% for artwork in search_results %}
-                    <li>{{ artwork.title }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-    <div class="container">
-        <a href="{% url 'tienda' %}" class="btn-tienda">tienda</a>
-    </div>
+    <h2 class="title">Lista de Blogs</h2>
+    <ul>
+        {% for blog in blogs %}
+            <li>{{ blog.title }}</li>
+            <p>{{ blog.content }}</p>
+        {% endfor %}
+    </ul>
 </body>
- </html>
+</html>

@@ -1,12 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'combined.html' %}
 
 {% block content %}
-<h1>Search Results</h1>
-<ul>
-    {% for result in results %}
-    <li>{{ result.title }}</li>
-    {% empty %}
-    <li>No results found.</li>
-    {% endfor %}
-</ul>
+    <h2 class="title">Resultados de búsqueda</h2>
+    <p>Término de búsqueda: {{ search_term }}</p>
+    <ul>
+        {% for result in search_results %}
+            <li>{{ result.title }}</li>
+            <p>{{ result.content }}</p>
+        {% empty %}
+            <li>No se encontraron resultados.</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

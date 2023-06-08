@@ -19,4 +19,3 @@ presentacion.html: Este archivo HTML define la estructura y el estilo de la pág
 combined.html: Este archivo HTML es la plantilla principal de la aplicación y muestra la combinación de varias funcionalidades, como información de Instagram, fecha y hora actual, imagen personalizada, saludo personalizado y resultados de búsqueda.
 models.py: Este archivo define los modelos de datos utilizados en la aplicación, como las obras de arte, los clientes y las órdenes.
 forms.py: En este archivo se definen los formularios utilizados en la aplicación, como el formulario de búsqueda y el formulario de datos del cliente.
-Espero que esta información sea útil para comprender el flujo y la estructura de tu proyecto Django. Si tienes alguna pregunta adicional, no dudes en preguntar.

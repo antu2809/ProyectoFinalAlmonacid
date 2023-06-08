@@ -1,0 +1,12 @@
+{% extends 'combined.html' %}
+
+{% block content %}
+    <h2 class="title">Eliminar Página</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <p>¿Estás seguro de que quieres eliminar esta página?</p>
+        <h3>{{ page.title }}</h3>
+        <p>{{ page.content }}</p>
+        <button type="submit">Eliminar</button>
+    </form>
+{% endblock %}
