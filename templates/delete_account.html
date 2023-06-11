@@ -107,27 +107,17 @@
         }
     </style>
 <head>
-    <title>Agregar Artwork</title>
+    <h1>Delete Account</h1>
 </head>
 <body>
-    <h1>Agregar Artwork</h1>
-
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <label for="title">Título:</label>
-        <input type="text" name="title" id="title" required><br>
-
-        <label for="description">Descripción:</label>
-        <textarea name="description" id="description" required></textarea><br>
-
-        <label for="price">Precio:</label>
-        <input type="number" name="price" id="price" required><br>
-
-        <label for="image">Imagen:</label>
-        <input type="file" name="image" id="image" accept="image/*" required><br>
-
-        <input type="submit" value="Agregar">
-    </form>
+ {% if error_message %}
+ <p class="error">{{ error_message }}</p>
+ {% endif %}
+ <form action="" method="post">
+    {% csrf_token %}
+    <label for="current_password">Current Password:</label>
+    <input type="password" name="current_password" id="current_password" required>
+    <input type="submit" value="Delete Account">
+   </form>
 </body>
-</html>
+ </html>

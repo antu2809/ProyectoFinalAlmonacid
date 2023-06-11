@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",  
-    "Proyecto_11",  
+    "Proyecto_1",  
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "Proyecto_11.wsgi.application"
+WSGI_APPLICATION = "Proyecto_1.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -94,10 +94,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Redireccion despues del login 
+LOGIN_REDIRECT_URL = '/profile/'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/static/"  # Agregar esta línea
+STATIC_URL = "/static/" 
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),

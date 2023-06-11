@@ -3,7 +3,8 @@ Este proyecto es una aplicación web desarrollada con Django, un framework de Py
 
 Para comenzar, abre el siguiente enlace en tu navegador: http://127.0.0.1:8000/view_presentacion/. Aquí verás una página de presentación donde puedes avanzar hacia la página principal haciendo clic en el botón de una rosa.
 
-Después de avanzar hacia la página principal, puedes encontrar las obras de arte disponibles. Para acceder a la tienda, haz clic en el botón de la rosa nuevamente o visita el siguiente enlace: http://127.0.0.1:8000/tienda/.
+Después de avanzar hacia la página principal, puedes encontrar las obras de arte disponibles. Ademas el usuario tiene la opcion de registrarse o iniciar sesion para poder compartir sus obras si así lo desea.
+Para acceder a la tienda, haz clic en el botón de la rosa nuevamente o visita el siguiente enlace: http://127.0.0.1:8000/tienda/.
 
 En la página de la tienda, puedes navegar por las obras de arte y seleccionar las que desees comprar. Cuando encuentres una obra que te interese, haz clic en el botón de "Agregar al carrito" para confirmar tu compra. Esto te llevará a la página de confirmación de compra.
 

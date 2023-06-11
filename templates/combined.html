@@ -108,58 +108,67 @@
             margin-bottom: 5px;
         }
     </style>
+    
 </head>
 <body>
-    <div class="container">
-        <div class="box">
-            {{ saludo_html|safe }}
-        </div>
-        <div class="box">
-            <h2 class="title">Galería</h2>
-            <h2 class="title">"Las Hijas"</h2>
-            <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
-            <p>la lola en pan bimbo y la mona estirada</p>
-            <div class="artwork">
-                <h2>{{ artwork.title }}</h2>
-                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
-                <p>{{ artwork.description }}</p>
-                <p>Artista: Kai</p>
-                <p>Año:2023 </p>
-                <p>Precio: USD $1.000.000</p>
-                <form method="POST" action="{% url 'realizar_compra' %}">
-                    {% csrf_token %} 
-                    <input type="hidden" name="artwork_id" value="{{ artwork.id }}">
-                    <input type="number" name="cantidad" min="1" value="1" required>
-                    <a href="{% url 'carrito' %}">Comprar</a>
-                </form>
+    <div class="right">
+        <a href="{% url 'signup' %}">Signup</a>
+        <a href="{% url 'login_view' %}">Login</a>
+    </div>    
+    <div class="box">
+        <h2 class="title">KAI</h2>
+        <h2 class="title">Galería</h2>
+        <h2 class="title">"Las Hijas"</h2>
+        <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
+        <p>la lola en pan bimbo y la mona estirada</p>
+        <div class="artwork">
+            <h2>{{ artwork.title }}</h2>
+            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
+            <p>{{ artwork.description }}</p>
+            <p>Artista: Kai</p>
+            <p>Año: 2023</p>
+            <p>Precio: USD $1.000.000</p>
+            <div class="like-and-share">
+                <button class="like-btn">Me gusta</button>
+                <button class="share-btn facebook">Compartir en Facebook</button>
+                <button class="share-btn instagram">Compartir en Instagram</button>
+                <button class="share-btn tiktok">Compartir en TikTok</button>
+                <button class="copy-link-btn">Copiar enlace</button>
             </div>
+            <form method="POST" action="{% url 'realizar_compra' %}">
+                {% csrf_token %} 
+                <input type="hidden" name="artwork_id" value="{{ artwork.id }}">
+                <input type="number" name="cantidad" min="1" value="1" required>
+                <button type="submit">Comprar</button>
+            </form>
         </div>
-        <div class="instagram-info">
-            <h2>Instagram</h2>
-            <h1><a href='https://www.instagram.com/kai.orosco/'>Sígueme en Instagram</a></h1>
-            <p>{{ instagram_info }}</p> <!-- Contenido de Instagram -->
-        </div>
-        <div id="video-container">
-            <video autoplay loop muted>
-                <source src="{% static 'gifkai.gif' %}" type="video/gif">
-            </video>
-        </div>
-        <form method="POST" action="">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Buscar</button>
-        </form>
-        {% if search_results %}
-            <h3>Resultados de la búsqueda:</h3>
-            <ul>
-                {% for artwork in search_results %}
-                    <li>{{ artwork.title }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
     </div>
+    <div class="instagram-info">
+        <h2>Instagram</h2>
+        <h1><a href='https://www.instagram.com/kai.orosco/'>Sígueme en Instagram</a></h1>
+        <p>{{ instagram_info }}</p>
+    </div>
+    <div id="video-container">
+        <video autoplay loop muted>
+            <source src="{% static 'gifkai.gif' %}" type="video/gif">
+        </video>
+    </div>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Buscar</button>
+    </form>
+    {% if search_results %}
+        <h3>Resultados de la búsqueda:</h3>
+        <ul>
+            {% for artwork in search_results %}
+                <li>{{ artwork.title }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
     <div class="container">
-        <a href="{% url 'tienda' %}" class="btn-tienda">tienda</a>
+        <a href="{% url 'tienda' %}" class="btn-tienda">Tienda</a>
     </div>
 </body>
- </html>
+</html>
+

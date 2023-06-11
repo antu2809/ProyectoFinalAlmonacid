@@ -1,7 +1,119 @@
-{% extends 'combined.html' %}
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        html,
+        body {
+            background-image: url("{% url 'show_gif' %}");
+            background-size: cover;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block content %}
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        .box {
+            border: 2px solid transparent;
+            padding: 5px;
+            margin: 0;
+            text-align: center;
+        }
+
+        .box:last-child {
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .artwork-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        img {
+            max-width: 40%;
+            max-height: 40%;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .gif-container {
+            position: fixed;
+            top: 50%;
+            left: 30%;
+            transform: translate(-10%, -50%) translateZ(0);
+        }
+
+        /* Estilos para el carrito */
+        .carrito-container {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .carrito-container h1,
+        .carrito-container h2 {
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .carrito-container p {
+            margin: 5px 0;
+        }
+
+        .carrito-container a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .carrito-container h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+    </style>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h2 class="title">la página que buscas no existe</h2>
+    <form method="post">
     <h2 class="title">Lo sentimos, la página que buscas no existe.</h2>
     <p>{{ message }}</p>
     <p>Si necesitas ayuda, por favor contacta a nuestro equipo de soporte en el siguiente correo electrónico: <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
-{% endblock %}
+    </form>
+</body>
+</html>

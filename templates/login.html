@@ -110,9 +110,12 @@
 </head>
 <body>
     <h2 class="title">Inicio de sesión</h2>
-    <form method="post">
+    <form method="post" action="{% url 'login_view' %}">
         {% csrf_token %}
         {{ form.as_p }}
+        {% if form.errors %}
+            <p class="error">Nombre de usuario o contraseña inválida</p>
+        {% endif %}
         <button type="submit">Iniciar sesión</button>
     </form>
 </body>

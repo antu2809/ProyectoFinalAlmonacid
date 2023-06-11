@@ -1,0 +1,34 @@
+{% block scripts %}
+    <script>
+        $(document).ready(function () {
+            $('.share-btn.facebook').click(function (event) {
+                event.preventDefault();
+                window.location.href = "{% url 'share-facebook' artwork.id %}";
+            });
+            $('.share-btn.instagram').click(function (event) {
+                event.preventDefault();
+                window.location.href = "{% url 'share-instagram' artwork.id %}";
+            });
+            $('.share-btn.tiktok').click(function (event) {
+                event.preventDefault();
+                window.location.href = "{% url 'share-tiktok' artwork.id %}";
+            });
+            $('.copy-link-btn').click(function () {
+                const url = "{{ full_url }}";
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Enlace copiado al portapapeles.');
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="like-and-share">
+        <button class="like-btn">Me gusta</button>
+        <button class="share-btn facebook">Compartir en Facebook</button>
+        <button class="share-btn instagram">Compartir en Instagram</button>
+        <button class="share-btn tiktok">Compartir en TikTok</button>
+        <button class="copy-link-btn">Copiar enlace</button>
+    </div>
+{% endblock %}
