@@ -12,10 +12,10 @@ class ClienteForm(forms.ModelForm):
         fields = ['nombre', 'email', 'telefono', 'direccion']
 
 class ArtworkForm(forms.ModelForm):
+    audio = forms.FileField(required=False)
     class Meta:
         model = Artwork
         fields = ['title', 'description', 'image', 'video', 'audio', 'price', 'is_published']
-
 
 class OrdenForm(forms.ModelForm):
     class Meta:
@@ -48,15 +48,12 @@ class LoginForm(forms.ModelForm):
     class Meta: 
         model = CustomUser 
         fields = ['username', 'password']
-
-
         
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         fields = ['quantity']
     
-
 class ContactForm(forms.Form):
     name = forms.CharField(label='Nombre', max_length=100)
     email = forms.EmailField(label='Correo electrónico', max_length=150)
