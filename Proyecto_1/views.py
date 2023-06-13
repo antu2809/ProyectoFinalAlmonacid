@@ -1,50 +1,35 @@
 import base64
 import datetime
+import os
+import requests
+import social_django
+import urllib.parse
+import PIL.Image
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
 from django.template import loader
-import requests
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
 from utils import current_datetime_view, saludo_view, show_image
 from django.conf import settings
 from io import BytesIO
-import os
-from django.urls import reverse
-from django.urls import include
-from django.urls import NoReverseMatch
-
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
+from django.urls import reverse, include, NoReverseMatch
+from django.shortcuts import redirect, get_object_or_404
 from django.templatetags.static import static
-from django.contrib import messages
+from django.contrib import messages, logout
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.http import require_POST
 from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.http import JsonResponse
-import PIL.Image
-from .models import Artwork
-from .models import Cliente
-from .models import Orden
-from .models import Page
-from .models import Profile
-from .models import Blog
-from .models import Like
-from .models import UserMessage
-from .forms import ClienteForm
-from .forms import BusquedaForm
-from .forms import PageForm
-from .forms import ProfileForm
-from .forms import SignupForm
-from .forms import LoginForm
-from .forms import ArtworkForm
-from .forms import ContactForm
-import social_django
-import urllib.parse
+from .models import Artwork, Profile, Cliente, UserMessage
+from .models import Orden, Page, Blog, Like, Purchase
+from .forms import ClienteForm, SignupForm, LoginForm, ProfileForm
+from .forms import ArtworkForm, PageForm, ContactForm, BusquedaForm
 
 imagen = PIL.Image.open(r"C:\Users\antua\OneDrive\Escritorio\Tercera-pre-entrega-Almonacid\Proyecto_11\static\images\my_image.jpg")
 imagen.show()
@@ -104,21 +89,20 @@ def combined_view(request):
     saludo_html = saludo(request)
     gifkai_url = static("gifkai.gif")
     template = loader.get_template("combined.html")
+    artworks = Artwork.objects.order_by('created_at')
     context = {
         "instagram_info": instagram_info,
         "current_datetime_html": current_datetime_html,
         "show_image_html": show_image_html,
         "saludo_html": saludo_html,
         "gifkai_url": gifkai_url,
+        "artworks": artworks, 
+        "form" : form,
+        "search_results": search_results
     }
     if search_results:
         context["search_results"] = search_results
-
-    context = {
-        'form': form,
-        'search_results': search_results
-    }
-    
+        
     return render(request, 'combined.html', context) 
     
 
@@ -126,8 +110,8 @@ def signup_view(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login/')
+           form.save()
+        return redirect('login_view')
     else:
         form = SignupForm()
     context = {'form': form}
@@ -135,15 +119,17 @@ def signup_view(request):
 
 def login_view(request):
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Redireccionar al perfil del usuario después de iniciar sesión exitosamente
-                return redirect('profile_view') 
+                # Redirije a create_profile si es su primer inicio de sesion 
+                if not hasattr(user, 'profile'):
+                    return redirect('create_profile')
+                return redirect('profile_view')
             else:
                 form.add_error(None, 'Nombre de usuario o contraseña inválida')
     else:
@@ -152,101 +138,47 @@ def login_view(request):
     return render(request, 'login.html', context)
 
 @login_required
+def create_profile(request):
+    # permite al usuario a crear su perfil ni no exite
+    if hasattr(request.user, 'profile'):
+        return redirect('profile_view')
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            return redirect('profile_view')
+    else:
+        form = ProfileForm()
+    context = {'form': form}
+    return render(request, 'create_profile.html', context)
+
+@login_required
 def profile_view(request):
-    # Si el usuario está autenticado, se puede acceder al perfil
-
-    profile = request.user.profile  
-
-    artworks = Artwork.objects.filter(artist=profile) if profile else None
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        artworks = Artwork.objects.filter(artist=profile)
+    else:
+        profile = None
+        artworks = None
 
     context = {'profile': profile, 'artworks': artworks}
     return render(request, 'profile.html', context)
 
 def logout_view(request):
-    # Cerrar la sesión del usuario y redirigir a la página de inicio de sesión
-    return redirect('login')
-
-def delete_account_view(request):
-           if request.method == 'POST':
-               # Verificar si la contraseña ingresada es correcta
-               current_password = request.POST.get('current_password')
-               user = authenticate(username=request.user.username,
-                                   password=current_password)
-
-               if user is not None:
-                   # Eliminar la cuenta del usuario actual
-                   User.objects.get(username=request.user.username).delete()
-                   return redirect('login')
-               else:
-                   # Mostrar un mensaje de error si la contraseña es incorrecta
-                   return render(request, 'delete_account.html',
-                                 {'error_message': 'Invalid password!'})
-
-           else:
-               return render(request, 'delete_account.html') #Mostrar la página de confirmación
+    # Cerrar la sesión del usuario
+    logout(request)
+    
+    # Redirigir a la página de inicio de sesión
+    return redirect('login_view')
 
 def messages_view(request):
     # Obtener los mensajes del usuario y mostrarlos en la plantilla
     user_messages = UserMessage.objects.filter(user=request.user.id)
     context = {'messages': user_messages}
     return render(request, 'messages.html', context)
-
-def home_view(request):
-    # Obtener todas las obras de arte y ordenarlas por fecha ascendente
-    artworks = Artwork.objects.order_by('-date_created')
-    return render(request, 'home.html', {'artworks': artworks})
-
-# Para compartir Facebook
-def share_facebook(request, id):
-    full_url = request.build_absolute_uri(reverse('artwork-detail', args=[id]))
-    urlparams = {'u': full_url}
-    redirect_url = 'https://www.facebook.com/sharer/sharer.php?' + urllib.parse.urlencode(urlparams)
-    return redirect(redirect_url)
-
-# Para compartir Instagram
-def share_instagram(request, id):
-    full_url = request.build_absolute_uri(reverse('artwork-detail', args=[id]))
-    urlparams = {'text': full_url}
-    redirect_url = 'https://www.instagram.com/create/story/' + urllib.parse.urlencode(urlparams)
-    return redirect(redirect_url)
-
-# Para compartir TikTok
-def share_tiktok(request, id):
-    full_url = request.build_absolute_uri(reverse('artwork-detail', args=[id]))
-    urlparams = {'u_code': full_url, 'lang': 'en'}
-    redirect_url = 'https://www.tiktok.com/upload/?' + urllib.parse.urlencode(urlparams)
-    return redirect(redirect_url)
-
-# Copiar la dirección de la publicación
-def copy_link(request, id):
-    full_url = request.build_absolute_uri(reverse('artwork-detail', args=[id]))
-    return render(request, 'artwork_detail.html', {'artwork': artwork_purchase, 'full_url': full_url})
-
-
-
-def artwork_detail(request, pk):
-    artwork = Artwork.objects.get(pk=pk)
-
-    # Determinar si el usuario actual ya ha indicado que le gusta la obra de arte
-    user = request.user
-    if user.is_authenticated:
-        like = Like.objects.filter(user=user, artwork=artwork).first()
-    else:
-        like = None
-
-    return render(request, 'artwork_detail.html', {'artwork': artwork, 'like': like})
-
-def update_profile_view(request):
-    profile = get_object_or_404(Profile, user=request.user)
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect('profile')
-    else:
-        form = ProfileForm(instance=profile)
-    context = {'form': form}
-    return render(request, 'update_profile.html', context)
 
 @login_required
 def artwork_upload(request):
@@ -256,7 +188,7 @@ def artwork_upload(request):
             artwork = form.save(commit=False)
             artwork.user = request.user
             artwork.save()
-            return redirect('artwork_detail', pk=artwork.pk)
+            return redirect('profile_view')  # Redirigir a la página de perfil después de guardar la obra de arte
     else:
         form = ArtworkForm()
     return render(request, 'artwork_upload.html', {'form': form})
@@ -302,21 +234,72 @@ def artwork_purchase(request, pk):
     # Redirigir a la página de detalle de la obra de arte
     return redirect('artwork_detail', pk=pk)
 
-def blog_list_view(request):
-    blogs = Blog.objects.all()
-    formatted_blogs = []
-    for blog in blogs:
-        formatted_blogs.append({
-            'title': blog.title,
-            'author': blog.author.name,
-            'content': blog.content[:100] + '...',
-        })
-    
-    data = {
-        'blogs': formatted_blogs,
-        'page_title': 'Lista de blogs',
-    }
-    return render(request, 'blog_list.html', data)
+# Para compartir Facebook
+def share_facebook(request, id):
+    full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
+    urlparams = {'u': full_url}
+    redirect_url = 'https://www.facebook.com/sharer/sharer.php?' + urllib.parse.urlencode(urlparams)
+    return redirect(redirect_url)
+
+# Para compartir Instagram
+def share_instagram(request, id):
+    full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
+    urlparams = {'text': full_url}
+    redirect_url = 'https://www.instagram.com/create/story/' + urllib.parse.urlencode(urlparams)
+    return redirect(redirect_url)
+
+# Para compartir TikTok
+def share_tiktok(request, id):
+    full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
+    urlparams = {'u_code': full_url, 'lang': 'en'}
+    redirect_url = 'https://www.tiktok.com/upload/?' + urllib.parse.urlencode(urlparams)
+    return redirect(redirect_url)
+
+# Copiar la dirección de la publicación
+def copy_link(request, id):
+    full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
+    return HttpResponse('Enlace copiado correctamente')
+
+def artwork_detail(request, pk):
+    artwork = Artwork.objects.get(pk=pk)
+    # Determinar si el usuario actual ya ha indicado que le gusta la obra de arte
+    user = request.user
+    if user.is_authenticated:
+        like = Like.objects.filter(user=user, artwork=artwork).first()
+    else:
+        like = None
+    return render(request, 'artwork_detail.html', {'artwork': artwork, 'like': like})
+
+def update_profile_view(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=profile)
+    context = {'form': form}
+    return render(request, 'update_profile.html', context)
+
+def delete_account_view(request):
+           if request.method == 'POST':
+               # Verificar si la contraseña ingresada es correcta
+               current_password = request.POST.get('current_password')
+               user = authenticate(username=request.user.username,
+                                   password=current_password)
+
+               if user is not None:
+                   # Eliminar la cuenta del usuario actual
+                   User.objects.get(username=request.user.username).delete()
+                   return redirect('login')
+               else:
+                   # Mostrar un mensaje de error si la contraseña es incorrecta
+                   return render(request, 'delete_account.html',
+                                 {'error_message': 'Invalid password!'})
+
+           else:
+               return render(request, 'delete_account.html') #Mostrar la página de confirmación
 
 def no_pages_view(request):
     error_message = "Lo sentimos, la página que buscas no existe."
@@ -336,7 +319,6 @@ def search_view(request):
         # Devolver los resultados de búsqueda a la plantilla correspondiente
         return render(request, 'search_results.html', {'search_term': search_term})
 
-
 def agregar_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -350,14 +332,12 @@ def agregar_cliente(request):
         'form': form,
         'saludo_html': saludo(request),
         'about_html': about_view(request).content.decode(),
-        'blog_list_html': blog_list_view(request).content.decode(),
         'no_pages_html': no_pages_view(request).content.decode(),
         'profile_html': profile_view(request).content.decode(),
         'update_profile_html': update_profile_view(request).content.decode(),
         'signup_html': signup_view(request).content.decode(),
         'login_html': login_view(request).content.decode(),
         'logout_html': logout_view(request).content.decode(),
-        'home_html': home_view(request).content.decode(),
         'search_html': search_view(request).content.decode(),
     }
     

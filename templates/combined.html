@@ -118,56 +118,50 @@
     <div class="box">
         <h2 class="title">KAI</h2>
         <h2 class="title">Galería</h2>
-        <h2 class="title">"Las Hijas"</h2>
-        <img class="artwork-image" src="{% url 'show_image' %}" alt="my_image">
-        <p>la lola en pan bimbo y la mona estirada</p>
-        <div class="artwork">
-            <h2>{{ artwork.title }}</h2>
-            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}">
-            <p>{{ artwork.description }}</p>
-            <p>Artista: Kai</p>
-            <p>Año: 2023</p>
-            <p>Precio: USD $1.000.000</p>
-            <div class="like-and-share">
-                <button class="like-btn">Me gusta</button>
-                <button class="share-btn facebook">Compartir en Facebook</button>
-                <button class="share-btn instagram">Compartir en Instagram</button>
-                <button class="share-btn tiktok">Compartir en TikTok</button>
-                <button class="copy-link-btn">Copiar enlace</button>
-            </div>
-            <form method="POST" action="{% url 'realizar_compra' %}">
-                {% csrf_token %} 
-                <input type="hidden" name="artwork_id" value="{{ artwork.id }}">
-                <input type="number" name="cantidad" min="1" value="1" required>
-                <button type="submit">Comprar</button>
-            </form>
-        </div>
-    </div>
-    <div class="instagram-info">
-        <h2>Instagram</h2>
-        <h1><a href='https://www.instagram.com/kai.orosco/'>Sígueme en Instagram</a></h1>
-        <p>{{ instagram_info }}</p>
+                {% for artwork in artworks %}
+                    <div class="col-md-4">
+                        <div class="card" style="background-color: transparent;">
+                            <img src="{{ profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
+                            <h6 class="card-username">{{ artwork.user.username }}</h6>
+                            <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ artwork.title }}</h5>
+                                <p class="card-text">{{ artwork.description }}</p>
+                                <audio controls>
+                                    <source src="{{ artwork.audio.url }}" type="{{ artwork.audio.mime_type }}">
+                                    Tu navegador no soporta la etiqueta audio.
+                                </audio>
+                                <p class="card-text">Precio: {{ artwork.price }} USD</p>
+                                <button class="btn:hover" onclick="like_artwork">Dar Me Gusta</button>
+                                <button class="btn:hover" onclick="artwork_purchase">Comprar</button>
+                                <button class="share-btn facebook" onclick="location.href='{% url 'share_facebook' id=artwork.id %}'">Compartir en Facebook</button>
+
+                                <button class="share-btn instagram" onclick="location.href='{% url 'share_instagram' id=artwork.id %}'">Compartir en Instagram</button>
+
+                                <button class="share-btn tiktok" onclick="location.href='{% url 'share_tiktok' id=artwork.id %}'">Compartir en TikTok</button>
+
+                                <button class="copy-link-btn" onclick="copyToClipboard('{% url 'copy_link' id=artwork.id %}')">Copiar enlace</button>
+
+                                <script>
+                                    function copyToClipboard(text) {
+                                         const el = document.createElement('textarea');
+                                         el.value = text;
+                                         document.body.appendChild(el);
+                                         el.select();
+                                         document.execCommand('copy');
+                                         document.body.removeChild(el);
+                                         alert('Enlace copiado correctamente.');
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
     </div>
     <div id="video-container">
         <video autoplay loop muted>
             <source src="{% static 'gifkai.gif' %}" type="video/gif">
         </video>
-    </div>
-    <form method="POST" action="">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Buscar</button>
-    </form>
-    {% if search_results %}
-        <h3>Resultados de la búsqueda:</h3>
-        <ul>
-            {% for artwork in search_results %}
-                <li>{{ artwork.title }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    <div class="container">
-        <a href="{% url 'tienda' %}" class="btn-tienda">Tienda</a>
     </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser, Group, Permission
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     # Campos y métodos adicionales del modelo User
     edad = models.IntegerField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
@@ -26,10 +26,8 @@ class Profile(models.Model):
     image = models.ImageField(upload_to='profile_images/')
     description = models.TextField()
     website = models.URLField()
-    field1 = models.CharField(max_length=100)
-    field2 = models.IntegerField()
-    field3 = models.BooleanField(default=False)
-
+    field1 = models.URLField(blank=True, null=True) 
+    
 
 class Artwork(models.Model):
     title = models.CharField(max_length=255)
@@ -37,10 +35,11 @@ class Artwork(models.Model):
     artist = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
     image = models.ImageField(upload_to='artwork_images/')
     video = models.URLField(blank=True)
-    audio = models.FileField(upload_to='audios/', blank=True)
+    audio = models.FileField(verbose_name='Archivo de audio', upload_to='audios/', blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)

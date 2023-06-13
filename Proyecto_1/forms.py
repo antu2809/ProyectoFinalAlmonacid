@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
-from .models import Cliente, Artwork, Orden, Page, Profile , Purchase
+from .models import Cliente, Artwork, Orden, Page, Profile , Purchase, CustomUser
 
 class ClienteForm(forms.ModelForm):
     email = forms.EmailField(label='Correo electrónico')
@@ -32,9 +31,10 @@ class PageForm(forms.ModelForm):
         fields = ['title', 'content']
 
 class ProfileForm(forms.ModelForm):
+    field1 = forms.URLField(required=False)
     class Meta:
         model = Profile
-        fields = ['user', 'image', 'description', 'website']
+        fields = ['user', 'image', 'description', 'website', 'field1']
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField()
@@ -43,9 +43,13 @@ class SignupForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'password1', 'password2']
         
-class LoginForm(AuthenticationForm):
-    class Meta:
+class LoginForm(forms.ModelForm): 
+    
+    class Meta: 
+        model = CustomUser 
         fields = ['username', 'password']
+
+
         
 class PurchaseForm(forms.ModelForm):
     class Meta:
