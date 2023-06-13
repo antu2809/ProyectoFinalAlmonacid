@@ -17,7 +17,7 @@ from io import BytesIO
 from django.urls import reverse, include, NoReverseMatch
 from django.shortcuts import redirect, get_object_or_404
 from django.templatetags.static import static
-from django.contrib import messages, logout
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -168,8 +168,6 @@ def profile_view(request):
     return render(request, 'profile.html', context)
 
 def logout_view(request):
-    # Cerrar la sesión del usuario
-    logout(request)
     
     # Redirigir a la página de inicio de sesión
     return redirect('login_view')

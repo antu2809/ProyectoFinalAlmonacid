@@ -121,7 +121,7 @@
                 {% for artwork in artworks %}
                     <div class="col-md-4">
                         <div class="card" style="background-color: transparent;">
-                            <img src="{{ profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
+                            <img src="{{ request.user.profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
                             <h6 class="card-username">{{ artwork.user.username }}</h6>
                             <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
                             <div class="card-body">
