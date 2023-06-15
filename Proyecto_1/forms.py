@@ -20,7 +20,7 @@ class ProfileForm(forms.ModelForm):
     website2 = forms.URLField(required=False)
     class Meta:
         model = Profile
-        fields = ['user', 'image', 'description', 'website', 'website2']
+        fields = ['image', 'description', 'website', 'website2']
 
 class SignupForm(UserCreationForm):
     email = forms.EmailField()

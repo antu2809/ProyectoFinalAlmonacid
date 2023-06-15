@@ -164,6 +164,9 @@
                         <li class="nav-item">
                           <a class="nav-link" href="{{ profile.website }}">{{ profile.website }}</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
                 
                       </ul>
                 </div>
@@ -180,11 +183,6 @@
                         {% if user.is_authenticated %}
                         <a href="{% url 'messages' %}">Ver mensajes</a>
                         {% endif %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h3 class="mb-4">Obras de arte</h3>
                     </div>
                 </div>
 

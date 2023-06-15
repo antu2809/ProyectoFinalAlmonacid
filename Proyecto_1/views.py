@@ -12,7 +12,7 @@ from django.urls import reverse, include, NoReverseMatch
 from django.shortcuts import redirect, get_object_or_404
 from django.templatetags.static import static
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.http import require_POST
@@ -137,14 +137,12 @@ def login_view(request):
 def create_profile(request):
     if hasattr(request.user, 'profile'):
         return redirect('profile_view')
-
     if request.method == 'POST':
-        user = CustomUser.objects.create(username=request.user.username)
         form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
-            profile = form.save(commit=False)
-            profile.user = user
-            profile.save()
+            Profile = form.save(commit=False)
+            Profile.user = request.user
+            Profile.save()
             return redirect('profile_view')
     else:
         form = ProfileForm()
@@ -166,11 +164,13 @@ def profile_view(request):
     context = {'profile': profile, 'artworks': artworks, 'user_messages': user_messages}
     return render(request, 'profile.html', context)
 
-
+@login_required 
 def logout_view(request):
-    
-    # Redirigir a la página de inicio de sesión
-    return redirect('login_view')
+    if request.method == 'POST': 
+      logout(request) 
+      return redirect('login_view') 
+    else: 
+      return render(request, 'logout.html')
 
 @login_required
 def messages_view(request):

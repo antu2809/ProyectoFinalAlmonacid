@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
     
 class Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='profile_images/')
     description = models.TextField()
     website = models.URLField()
