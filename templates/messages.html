@@ -112,9 +112,9 @@
     <h2 class="title">Mensajes del Usuario</h2>
     <ul>
         {% for message in messages %}
-            <li>{{ message.subject }}</li>
-            <p>{{ message.content }}</p>
-        {% endfor %}
+        <li>{{ message.name }}</li>
+        <p>{{ message.message }}</p>
+    {% endfor %}
     </ul>
 </body>
 </html>

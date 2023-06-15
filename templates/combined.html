@@ -111,12 +111,14 @@
     
 </head>
 <body>
-    <div class="right">
-        <a href="{% url 'signup' %}">Registrarse</a>
-        <a href="{% url 'login_view' %}">Iniciar sesión</a>
-    </div>    
+        
     <div class="box">
+        
         <h2 class="title">La Galería Rosa</h2>
+        <div class="right">
+            <a href="{% url 'signup' %}">Registrarse</a>
+            <a href="{% url 'login_view' %}">Iniciar sesión</a>
+        </div>
         <h2 class="title">&#x1F339;</h2>
         {% for artwork in artworks %}
             <div class="col-md-4">
@@ -140,8 +142,9 @@
                         </form>
                         <form action="{% url 'send_message' pk=artwork.pk %}" method="post">
                             {% csrf_token %}
+                            <input type="hidden" name="artwork" value="{{ artwork.pk }}">
                             <input type="submit" name="send_message" value="Enviar mensaje">
-                        </form>
+                        </form>    
                         <form action="{% url 'artwork_detail' pk=artwork.pk %}" method="post">
                             {% csrf_token %}
                             <input type="submit" value="Comprar">

@@ -135,11 +135,8 @@ def login_view(request):
 
 @login_required
 def create_profile(request):
-    if hasattr(request.user, 'profile'):
-        return redirect('profile_view')
-
     if request.method == 'POST':
-        user = CustomUser.objects.create(username=request.user.username)
+        user = CustomUser.objects.create(username=request.user.username + '_profile')
         form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
@@ -186,13 +183,16 @@ def send_message(request, pk):
         form = MessageForm(request.POST)
         if form.is_valid():
             message = form.save(commit=False)
-            message.sender = CustomUser.objects.get(id=pk).profile
-            message.receiver = CustomUser.objects.get(id=pk).profile
-            artwork_id = request.POST.get('artwork')
+            message.user = request.user
+            sender = request.user
+            receiver = get_object_or_404(CustomUser, id=pk)
+            artwork_id = pk 
             try:
                 artwork = Artwork.objects.get(id=artwork_id)
             except Artwork.DoesNotExist:
                 return HttpResponse('El Artwork no existe')
+            message.sender = sender
+            message.receiver = receiver
             message.artwork = artwork
             message.save()
             return redirect('artwork_detail', pk=message.artwork.id)

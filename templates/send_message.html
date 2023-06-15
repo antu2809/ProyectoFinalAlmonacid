@@ -109,9 +109,9 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <h1>Enviar mensaje</h1>
     <form method="POST">
         {% csrf_token %}
+        <input type="hidden" name="artwork" value="{{ artwork.pk }}">
         {{ form.as_p }}
         <button type="submit">Enviar</button>
     </form>

@@ -246,11 +246,10 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ saved_artwork.artwork.title }}</h5>
                                 <p class="card-text">{{ saved_artwork.artwork.description }}</p>
-                                {% if saved_artwork.artwork.audio %}
+                                {% if artwork.audio %}
                                 <audio controls>
-                                  <source src="{{ saved_artwork.artwork.audio_file.url }}" type="{{ saved_artwork.artwork.audio.mime_type }}">
-                                  Tu navegador no soporta la etiqueta audio.
-                               </audio>
+                                    <source src="{{ artwork.audio.url }}" type="{{ artwork.audio.mime_type }}">
+                                </audio>
                                {% endif %}
                                <p class="card-text">Precio: {{ saved_artwork.artwork.price }} USD</p>
                             </div>
