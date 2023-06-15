@@ -1,5 +1,5 @@
 from django.contrib import admin 
-from .models import CustomUser, Post, Profile, Artwork, SavedArtwork, UserMessage, Purchase
+from .models import CustomUser, Profile, Artwork, SavedArtwork, UserMessage, Purchase
 
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ['username', 'email', 'edad', 'direccion']
@@ -7,13 +7,6 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ['username', 'email']
 
 admin.site.register(CustomUser, CustomUserAdmin)
-
-class PostAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'user', 'fecha_creacion']
-    list_filter = ['user']
-    search_fields = ['titulo', 'contenido']
-
-admin.site.register(Post, PostAdmin)
 
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['user', 'image', 'description', 'website']
