@@ -1,34 +1,129 @@
-{% block scripts %}
-    <script>
-        $(document).ready(function () {
-            $('.share-btn.facebook').click(function (event) {
-                event.preventDefault();
-                window.location.href = "{% url 'share-facebook' artwork.id %}";
-            });
-            $('.share-btn.instagram').click(function (event) {
-                event.preventDefault();
-                window.location.href = "{% url 'share-instagram' artwork.id %}";
-            });
-            $('.share-btn.tiktok').click(function (event) {
-                event.preventDefault();
-                window.location.href = "{% url 'share-tiktok' artwork.id %}";
-            });
-            $('.copy-link-btn').click(function () {
-                const url = "{{ full_url }}";
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('Enlace copiado al portapapeles.');
-                });
-            });
-        });
-    </script>
-{% endblock %}
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        html,
+        body {
+            background-image: url("{% url 'show_gif' %}");
+            background-size: cover;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block content %}
-    <div class="like-and-share">
-        <button class="like-btn">Me gusta</button>
-        <button class="share-btn facebook">Compartir en Facebook</button>
-        <button class="share-btn instagram">Compartir en Instagram</button>
-        <button class="share-btn tiktok">Compartir en TikTok</button>
-        <button class="copy-link-btn">Copiar enlace</button>
-    </div>
-{% endblock %}
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        .box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+        }
+
+        .box:last-child {
+            position: absolute;
+            bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .artwork-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        img {
+            max-width: 40%;
+            max-height: 40%;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .gif-container {
+            position: fixed;
+            top: 50%;
+            left: 30%;
+            transform: translate(-10%, -50%) translateZ(0);
+        }
+
+        /* Estilos para el carrito */
+        .carrito-container {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .carrito-container h1,
+        .carrito-container h2 {
+            font-size: 24px;
+            margin-top: 0;
+        }
+
+        .carrito-container p {
+            margin: 5px 0;
+        }
+
+        .carrito-container a {
+            color: blue;
+            text-decoration: underline;
+        }
+
+        .carrito-container h3 {
+            font-size: 18px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+    </style>
+    <title>{{ title }}</title>
+</head>
+<body>
+  <div class="box">
+     <h1>Detalles de la obra de arte</h1>
+      <p>Título: {{ artwork.title }}</p>
+     <p>Artista: {{ artwork.artist }}</p>
+     <p>Descripción: {{ artwork.description }}</p>
+     <p>CBU: {{ artwork.cbu }}</p>
+         <!-- Aquí puedes mostrar más detalles de la obra de arte según tus necesidades -->
+
+     <h2>Enviar mensaje al artista con la confirmacion de compra y adjunta el comprobante correspondiente</h2>
+       <form method="post">
+         {% csrf_token %}
+         {{ form.as_p }}
+          <button type="submit">Enviar mensaje</button>
+       </form>
+  </div> 
+</body>
+</html>

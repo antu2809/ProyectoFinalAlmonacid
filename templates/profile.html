@@ -145,7 +145,7 @@
         <body>
 
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="#">Perfil de Usuario</a>
+                <a class="navbar-brand" href="#">&#x1F339;</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -168,7 +168,26 @@
                       </ul>
                 </div>
             </nav>
-            
+
+            <div class="container my-5">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="mb-4">Mensajes</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'messages' %}">Ver mensajes</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="mb-4">Obras de arte</h3>
+                    </div>
+                </div>
+
             <div class="container my-5">
                 <div class="row">
                     <div class="col-md-12">
@@ -185,7 +204,7 @@
                                 <h5 class="card-title">{{ artwork.title }}</h5>
                                 <p class="card-text">{{ artwork.description }}</p>
                                 <audio controls>
-                                    <source src="{{ artwork.audio.url }}" type="{{ artwork.audio.mime_type }}">
+                                    <source src=" {% if artwork.audio %} {{ record.audio_file.url }} {% endif %}" type="{{ artwork.audio.mime_type }}">
                                     Tu navegador no soporta la etiqueta audio.
                                 </audio>
                                 <p class="card-text">Precio: {{ artwork.price }} USD</p>
@@ -212,7 +231,35 @@
                     </div>
                     {% endfor %}
                 </div>
-            
+
+                <!-- Agrega una nueva fila para la sección de obras guardadas -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h3 class="mb-4">Obras guardadas</h3>
+                    </div>
+                </div>
+
+               <!-- Agrega una nueva fila con las obras de arte guardadas por el usuario -->
+               <div class="row">
+                    {% for saved_artwork in saved_artworks %}
+                    <div class="col-md-4">
+                      <div class="card" style="background-color: transparent;">
+                            <img src="{{ saved_artwork.artwork.image.url }}" class="card-img-top" alt="{{ saved_artwork.artwork.title }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ saved_artwork.artwork.title }}</h5>
+                                <p class="card-text">{{ saved_artwork.artwork.description }}</p>
+                                {% if saved_artwork.artwork.audio %}
+                                <audio controls>
+                                  <source src="{{ saved_artwork.artwork.audio_file.url }}" type="{{ saved_artwork.artwork.audio.mime_type }}">
+                                  Tu navegador no soporta la etiqueta audio.
+                               </audio>
+                               {% endif %}
+                               <p class="card-text">Precio: {{ saved_artwork.artwork.price }} USD</p>
+                            </div>
+                      </div>
+                    </div>
+                     {% endfor %}
+                </div>
                 <div class="row justify-content-center my-5">
                     <a href="{% url 'artwork_upload' %}" class="btn btn-primary">Añadir obra de arte</a>
                 </div>

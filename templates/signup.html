@@ -34,10 +34,11 @@
         }
 
         .box {
-            border: 2px solid transparent;
-            padding: 5px;
-            margin: 0;
-            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
         }
 
         .box:last-child {
@@ -109,11 +110,13 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <h2 class="title">Registro</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrarse</button>
-    </form>
+  <div class="box">
+     <h2 class="title">Registro</h2>
+     <form method="post">
+         {% csrf_token %}
+         {{ form.as_p }}
+         <button type="submit">Registrarse</button>
+     </form>
+  </div> 
 </body>
 </html>

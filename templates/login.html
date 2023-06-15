@@ -8,8 +8,12 @@
         html,
         body {
             background-image: url("{% url 'show_gif' %}");
+            border: none;
             background-size: cover;
-            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             margin: 0;
             padding: 0;
         }
@@ -34,16 +38,18 @@
         }
 
         .box {
-            border: 2px solid transparent;
-            padding: 5px;
-            margin: 0;
-            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
         }
 
         .box:last-child {
             position: absolute;
             bottom: 0;
             margin-bottom: 20px;
+            background-color: transparent;
         }
 
         .title {
@@ -67,9 +73,14 @@
         }
 
         .container {
-            margin: 0 auto;
-            max-width: 800px;
-        }
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            margin-top: 50px;
+          }
 
         .gif-container {
             position: fixed;
@@ -105,18 +116,26 @@
             margin-top: 15px;
             margin-bottom: 5px;
         }
+        form {
+            background-color: transparent;
+            padding: 20px;
+            border: none;
+          }
     </style>
     <title>{{ title }}</title>
 </head>
 <body>
-    <h2 class="title">Inicio de sesión</h2>
-    <form method="post" action="{% url 'login_view' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {% if form.errors %}
-            <p class="error">Nombre de usuario o contraseña inválida</p>
-        {% endif %}
-        <button type="submit">Iniciar sesión</button>
-    </form>
+    <div class="box">
+       <h2 class="title">Inicio de sesión</h2>
+
+       <form method="post" action="{% url 'login_view' %}">
+           {% csrf_token %}
+           {{ form.as_p }}
+           {% if form.errors %}
+               <p class="error">Nombre de usuario o contraseña inválida</p>
+           {% endif %}
+           <button type="submit">Iniciar sesión</button>
+       </form>
+    </div>  
 </body>
 </html>

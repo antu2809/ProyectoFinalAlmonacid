@@ -1,10 +1,4 @@
-import base64
-import datetime
-import os
-import requests
-import social_django
-import urllib.parse
-import PIL.Image
+import base64, datetime, os, requests, social_django, urllib.parse, PIL.Image, random
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
 from django.template import loader
@@ -18,18 +12,16 @@ from django.urls import reverse, include, NoReverseMatch
 from django.shortcuts import redirect, get_object_or_404
 from django.templatetags.static import static
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.http import require_POST
-from django.db.models import Q
+from django.db.models import Sum
 from django.http import HttpResponseNotFound
 from django.http import JsonResponse
-from .models import Artwork, Profile, Cliente, UserMessage
-from .models import Orden, Page, Blog, Like, Purchase
-from .forms import ClienteForm, SignupForm, LoginForm, ProfileForm
-from .forms import ArtworkForm, PageForm, ContactForm, BusquedaForm
+from .models import Artwork, CustomUser , Profile, UserMessage, SavedArtwork, Purchase
+from .forms import SignupForm, LoginForm, ProfileForm, MessageForm
+from .forms import ArtworkForm, BusquedaForm
 
 imagen = PIL.Image.open(r"C:\Users\antua\OneDrive\Escritorio\Tercera-pre-entrega-Almonacid\Proyecto_11\static\images\my_image.jpg")
 imagen.show()
@@ -42,21 +34,25 @@ def about_view(request):
     }
     return render(request, 'about.html', data)
 
+
 def show_gif_presentacion(request):
-    gif_path = os.path.join(settings.STATICFILES_DIRS[0], "images/iniciogifkai.gif")
+    gif_path = os.path.join(settings.STATIC_ROOT, "images/lagaleriarosa.gif")
     with open(gif_path, "rb") as f:
-        response = HttpResponse(f.read(), content_type="image/gif")
-        response["Content-Disposition"] = 'inline; filename="iniciogifkai.gif"'
+        gif_binary = f.read()
+        gif_base64 = base64.b64encode(gif_binary).decode("utf-8")
+        response = HttpResponse(gif_binary, content_type="image/gif")
+        response["Content-Disposition"] = 'inline; filename="lagaleriarosa.gif"'
         response["Content-Transfer-Encoding"] = "binary"
         response["Cache-Control"] = "no-cache"
-        response["X-Sendfile"] = gif_path
         response["Content-Length"] = os.path.getsize(gif_path)
         response.write(
-            '<img src="data:image/gif;base64,{}" class="center" style="max-width:100%;">'.format(
-                base64.b64encode(f.read()).decode("utf-8")
+            '<img src="data:image/gif;base64,{}{}" class="center" style="max-width:100%;">'.format(
+                gif_base64,
+                "?cache_bust=" + str(random.randint(1, 10000))  # add cache-busting parameter
             )
         )
         return response
+
 
 
 def view_presentacion(request):
@@ -88,7 +84,6 @@ def combined_view(request):
     show_image_html = show_image(request).content
     saludo_html = saludo(request)
     gifkai_url = static("gifkai.gif")
-    template = loader.get_template("combined.html")
     artworks = Artwork.objects.order_by('created_at')
     context = {
         "instagram_info": instagram_info,
@@ -137,17 +132,18 @@ def login_view(request):
     context = {'form': form}
     return render(request, 'login.html', context)
 
+
 @login_required
 def create_profile(request):
-    # permite al usuario a crear su perfil ni no exite
     if hasattr(request.user, 'profile'):
         return redirect('profile_view')
 
     if request.method == 'POST':
+        user = CustomUser.objects.create(username=request.user.username)
         form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.user = request.user
+            profile.user = user
             profile.save()
             return redirect('profile_view')
     else:
@@ -158,25 +154,44 @@ def create_profile(request):
 @login_required
 def profile_view(request):
     if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
+        user = request.user
+        profile = user.profile
         artworks = Artwork.objects.filter(artist=profile)
+        user_messages = UserMessage.objects.filter(user=profile.user)
     else:
         profile = None
         artworks = None
+        user_messages = None
 
-    context = {'profile': profile, 'artworks': artworks}
+    context = {'profile': profile, 'artworks': artworks, 'user_messages': user_messages}
     return render(request, 'profile.html', context)
+
 
 def logout_view(request):
     
     # Redirigir a la página de inicio de sesión
     return redirect('login_view')
 
+@login_required
 def messages_view(request):
-    # Obtener los mensajes del usuario y mostrarlos en la plantilla
     user_messages = UserMessage.objects.filter(user=request.user.id)
     context = {'messages': user_messages}
     return render(request, 'messages.html', context)
+
+@login_required
+def send_message(request, pk):
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user.profile
+            message.receiver = CustomUser.objects.get(id=pk).profile
+            message.artwork = Artwork.objects.get(id=request.POST.get('artwork'))
+            message.save()
+            return redirect('artwork_detail', pk=message.artwork.id)
+    else:
+        form = MessageForm()
+    return render(request, 'send_message.html', {'form': form})
 
 @login_required
 def artwork_upload(request):
@@ -193,20 +208,19 @@ def artwork_upload(request):
 
 @login_required
 @require_POST
-def like_artwork(request, pk):
+def save_artwork(request, pk):
     artwork = Artwork.objects.get(pk=pk)
     user = request.user
 
-    # Crea una nueva instancia de Like si el usuario aún no ha dado me gusta a la obra de arte
-    if not Like.objects.filter(user=user, artwork=artwork).exists():
-        like = Like.objects.create(user=user, artwork=artwork)
-        artwork.likes += 1
-        artwork.save()
-        return JsonResponse({'success': True, 'likes': artwork.likes})
+    # Crea una nueva instancia de SavedArtwork si el usuario aún no ha guardado la obra de arte
+    if not SavedArtwork.objects.filter(user=user, artwork=artwork).exists():
+        saved_artwork = SavedArtwork.objects.create(user=user, artwork=artwork)
+        return redirect('profile_view')  # Redirigir a la página de perfil después de guardar la obra de arte
     else:
-        return JsonResponse({'success': False})
+        return HttpResponse('Ya ha guardado esta obra de arte')
 
-Purchase = None 
+
+purchase = None 
 @login_required
 def artwork_purchase(request, pk):
     artwork = Artwork.objects.get(pk=pk)
@@ -230,7 +244,7 @@ def artwork_purchase(request, pk):
     purchase.save()
 
     # Redirigir a la página de detalle de la obra de arte
-    return redirect('artwork_detail', pk=pk)
+    return redirect('artwork_detai.html', pk=pk)
 
 # Para compartir Facebook
 def share_facebook(request, id):
@@ -258,15 +272,27 @@ def copy_link(request, id):
     full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
     return HttpResponse('Enlace copiado correctamente')
 
+@login_required
 def artwork_detail(request, pk):
     artwork = Artwork.objects.get(pk=pk)
-    # Determinar si el usuario actual ya ha indicado que le gusta la obra de arte
-    user = request.user
-    if user.is_authenticated:
-        like = Like.objects.filter(user=user, artwork=artwork).first()
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user.profile
+            message.receiver = artwork.artist
+            message.artwork = artwork
+            message.save()
+            # Redirigir al usuario a la página de detalle de la obra de arte con un mensaje de confirmación
+            return redirect('artwork_detail', pk=pk)
+
     else:
-        like = None
-    return render(request, 'artwork_detail.html', {'artwork': artwork, 'like': like})
+        form = MessageForm(initial={'receiver': artwork.artist.id})
+
+    # Renderizar la plantilla con los datos necesarios
+    context = {'artwork': artwork, 'form': form}
+    return render(request, 'artwork_detail.html', context)
 
 def update_profile_view(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -289,7 +315,7 @@ def delete_account_view(request):
 
                if user is not None:
                    # Eliminar la cuenta del usuario actual
-                   User.objects.get(username=request.user.username).delete()
+                   CustomUser.objects.get(username=request.user.username).delete()
                    return redirect('login')
                else:
                    # Mostrar un mensaje de error si la contraseña es incorrecta
@@ -317,64 +343,9 @@ def search_view(request):
         # Devolver los resultados de búsqueda a la plantilla correspondiente
         return render(request, 'search_results.html', {'search_term': search_term})
 
-def agregar_cliente(request):
-    if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('carrito') 
-    else:
-        form = ClienteForm()
-    
-    context = {
-        'form': form,
-        'saludo_html': saludo(request),
-        'about_html': about_view(request).content.decode(),
-        'no_pages_html': no_pages_view(request).content.decode(),
-        'profile_html': profile_view(request).content.decode(),
-        'update_profile_html': update_profile_view(request).content.decode(),
-        'signup_html': signup_view(request).content.decode(),
-        'login_html': login_view(request).content.decode(),
-        'logout_html': logout_view(request).content.decode(),
-        'search_html': search_view(request).content.decode(),
-    }
-    
-    return render(request, 'combined.html', context)
-
 def tienda(request):
     artworks = Artwork.objects.all()
     return render(request, "tienda.html", {"artworks": artworks})
-
-
-def realizar_compra(request):
-    if request.method == 'POST':
-        # Obtener los datos del formulario
-        artwork_id = request.POST.get('artwork_id')
-        cantidad = int(request.POST.get('cantidad'))
-
-        # Obtener la obra de arte
-        artwork = Artwork.objects.get(id=artwork_id)
-
-        # Realizar el cálculo del total
-        precio = artwork.precio
-        total = precio * cantidad
-
-        # Aquí puedes realizar las operaciones necesarias con los datos de la compra
-
-        # Crear una nueva instancia de Orden
-        orden = Orden(
-            artwork=artwork,
-            cantidad=cantidad,
-            total=total
-        )
-        orden.save()  # Guardar la orden en la base de datos
-
-        # Redireccionar a una página de confirmación o a otra vista
-        return redirect('confirmacion_compra')
-
-    # Si es un método GET, simplemente renderizar la plantilla "realizar_compra.html"
-    return render(request, "realizar_compra.html")
-
 
 def carrito(request):
     return render(request, 'carrito.html')

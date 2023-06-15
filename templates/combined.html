@@ -112,51 +112,48 @@
 </head>
 <body>
     <div class="right">
-        <a href="{% url 'signup' %}">Signup</a>
-        <a href="{% url 'login_view' %}">Login</a>
+        <a href="{% url 'signup' %}">Registrarse</a>
+        <a href="{% url 'login_view' %}">Iniciar sesión</a>
     </div>    
     <div class="box">
-        <h2 class="title">KAI</h2>
-        <h2 class="title">Galería</h2>
-                {% for artwork in artworks %}
-                    <div class="col-md-4">
-                        <div class="card" style="background-color: transparent;">
-                            <img src="{{ request.user.profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
-                            <h6 class="card-username">{{ artwork.user.username }}</h6>
-                            <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ artwork.title }}</h5>
-                                <p class="card-text">{{ artwork.description }}</p>
-                                <audio controls>
-                                    <source src="{{ artwork.audio.url }}" type="{{ artwork.audio.mime_type }}">
-                                    Tu navegador no soporta la etiqueta audio.
-                                </audio>
-                                <p class="card-text">Precio: {{ artwork.price }} USD</p>
-                                <button class="btn:hover" onclick="like_artwork">Dar Me Gusta</button>
-                                <button class="btn:hover" onclick="artwork_purchase">Comprar</button>
-                                <button class="share-btn facebook" onclick="location.href='{% url 'share_facebook' id=artwork.id %}'">Compartir en Facebook</button>
-
-                                <button class="share-btn instagram" onclick="location.href='{% url 'share_instagram' id=artwork.id %}'">Compartir en Instagram</button>
-
-                                <button class="share-btn tiktok" onclick="location.href='{% url 'share_tiktok' id=artwork.id %}'">Compartir en TikTok</button>
-
-                                <button class="copy-link-btn" onclick="copyToClipboard('{% url 'copy_link' id=artwork.id %}')">Copiar enlace</button>
-
-                                <script>
-                                    function copyToClipboard(text) {
-                                         const el = document.createElement('textarea');
-                                         el.value = text;
-                                         document.body.appendChild(el);
-                                         el.select();
-                                         document.execCommand('copy');
-                                         document.body.removeChild(el);
-                                         alert('Enlace copiado correctamente.');
-                                    }
-                                </script>
-                            </div>
-                        </div>
+        <h2 class="title">La Galería Rosa</h2>
+        <h2 class="title">&#x1F339;</h2>
+        {% for artwork in artworks %}
+            <div class="col-md-4">
+                <div class="card" style="background-color: transparent;">
+                    <img src="{{ request.user.profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
+                    <h6 class="card-username">{{ request.profile.user }}</h6>
+                    <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ artwork.title }}</h5>
+                        <p class="card-text">{{ artwork.description }}</p>
+                        {% if artwork.audio %} 
+                           <audio controls>
+                               <source src="{{ artwork.audio.url }}" type="{{ artwork.audio.mime_type }}">
+                           </audio>
+                        {% endif %}
+                        <p class="card-text">Precio: {{ artwork.price }} $</p>
+                        <form action="{% url 'save_artwork' pk=artwork.pk %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="pk" value="{{ artwork.pk }}">
+                            <input type="submit" value="Guardar">
+                        </form>
+                        <form action="{% url 'send_message' pk=artwork.pk %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" name="send_message" value="Enviar mensaje">
+                        </form>
+                        <form action="{% url 'artwork_detail' pk=artwork.pk %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="Comprar">
+                        </form>
+                        <button class="share-btn facebook" onclick="location.href='{% url 'share_facebook' id=artwork.id %}'">Compartir en Facebook</button>
+                        <button class="share-btn instagram" onclick="location.href='{% url 'share_instagram' id=artwork.id %}'">Compartir en Instagram</button>
+                        <button class="share-btn tiktok" onclick="location.href='{% url 'share_tiktok' id=artwork.id %}'">Compartir en TikTok</button>
+                        <button class="copy-link-btn" onclick="copyToClipboard('{% url 'copy_link' id=artwork.id %}')">Copiar enlace</button>
                     </div>
-                {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
     </div>
     <div id="video-container">
         <video autoplay loop muted>
