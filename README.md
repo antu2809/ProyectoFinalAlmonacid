@@ -1,6 +1,6 @@
 Proyecto Final Coder House - Python
-Comisión: 27615
-Alumno: Johannes Pérez
+Comisión: 40445
+Alumno: Francisco Antu Almonacid Cammarata 
 Nombre del Proyecto
 "La Galería Rosa"
 
