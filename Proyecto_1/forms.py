@@ -3,18 +3,15 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import  Artwork, Profile , Purchase, CustomUser, UserMessage
 
-
 class ArtworkForm(forms.ModelForm):
     audio = forms.FileField(required=False)
     cbu = forms.CharField(label='CBU', max_length=50, required=True)
     class Meta:
         model = Artwork
         fields = ['title', 'description', 'image', 'video', 'audio', 'price', 'cbu']
-
         
 class BusquedaForm(forms.Form):
     search_text = forms.CharField(label='Buscar')
-
 
 class ProfileForm(forms.ModelForm):
     website2 = forms.URLField(required=False)

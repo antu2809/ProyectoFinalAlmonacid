@@ -4,13 +4,12 @@ from django.contrib import admin
 from django.conf import settings
 
 class CustomUser(AbstractUser):
-   
     edad = models.IntegerField(null=True, blank=True)
     direccion = models.CharField(max_length=255, null=True, blank=True)
+    profile_image = models.ImageField(upload_to='profile_images/', null=True, blank=True)
 
-
-    groups = models.ManyToManyField(Group, related_name='custom_user_set')
-    user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
+    def _str_(self):
+        return self.username
     
 class Profile(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')

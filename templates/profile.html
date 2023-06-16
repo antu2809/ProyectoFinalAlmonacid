@@ -155,7 +155,11 @@
                     </ul>
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <img src="{{ profile.image.url }}" alt="Imagen de perfil" style="max-width: 200px; max-height: 200px; height: auto;">
+                            {% if profile_image_url %}
+                               <img src="{{ profile_image_url }}" alt="Profile Image">
+                            {% else %}
+                               <p>No profile image available.</p>
+                            {% endif %}
                         </li>
                         <li class="navbar-text">{{ profile.description }}</li>
                         <li class="nav-item">

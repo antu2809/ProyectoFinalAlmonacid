@@ -132,7 +132,6 @@ def login_view(request):
     context = {'form': form}
     return render(request, 'login.html', context)
 
-
 @login_required
 def create_profile(request):
     if request.method == 'POST':
@@ -142,6 +141,11 @@ def create_profile(request):
             profile = form.save(commit=False)
             profile.user = user
             profile.save()
+
+            # Guardar la imagen de perfil en el usuario
+            user.profile_image = profile.image
+            user.save()
+
             return redirect('profile_view')
     else:
         form = ProfileForm()
@@ -150,17 +154,17 @@ def create_profile(request):
 
 @login_required
 def profile_view(request):
-    if request.user.is_authenticated:
-        user = request.user
-        profile = Profile.objects.filter(user_id=user.id)
-        artworks = Artwork.objects.filter(artist_id=user.id)
-        user_messages = UserMessage.objects.filter(user=user)
-    else:
-        profile = None
-        artworks = None
-        user_messages = None
+    profile = request.user.profile
 
-    context = {'profile': profile, 'artworks': artworks, 'user_messages': user_messages}
+    if profile.profile_image:  # Verifica si hay un archivo asociado a profile_image
+        profile_image_url = profile.profile_image.url
+    else:
+        profile_image_url = None
+
+    context = {
+        'profile': profile,
+        'profile_image_url': profile_image_url
+    }
     return render(request, 'profile.html', context)
 
 @login_required 
