@@ -154,18 +154,21 @@ def create_profile(request):
 
 @login_required
 def profile_view(request):
-    profile = request.user.profile
+    profile = request.user.profile.first()
 
-    if profile.profile_image:  # Verifica si hay un archivo asociado a profile_image
-        profile_image_url = profile.profile_image.url
-    else:
-        profile_image_url = None
+    profile_image_url = None
+    try:
+        if profile.profile_image:  # Verifica si hay un archivo asociado a profile_image
+            profile_image_url = profile.profile_image.url
+    except AttributeError:
+        pass
 
     context = {
         'profile': profile,
         'profile_image_url': profile_image_url
     }
     return render(request, 'profile.html', context)
+
 
 @login_required 
 def logout_view(request):

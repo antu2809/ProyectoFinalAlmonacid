@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
     
 class Profile(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
-    image = models.ImageField(upload_to='profile_images/')
+    image  = models.ImageField(upload_to='profile_images/')
     description = models.TextField()
     website = models.URLField()
     field1 = models.URLField(blank=True, null=True) 

@@ -24,7 +24,7 @@ class SignupForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['profile_image','username', 'email', 'password1', 'password2']
         
 class LoginForm(forms.ModelForm): 
     
