@@ -23,6 +23,8 @@ En caso de querer cerrar sesion los usuarios tienen diponible la opcion logout e
 
 
 Tecnología Utilizada:
+
+
 . Front-End: 
 HTML 
 CSS 
