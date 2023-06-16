@@ -64,6 +64,7 @@ def view_presentacion(request):
             "boton_font": "Orbitron-VariableFont_wght",
             "boton_color": "rgb(15, 7, 8)",
             "boton_url": "http://127.0.0.1:8000/combined/",
+            "boton_about": "http://127.0.0.1:8000/about/"
         },
     )
     
@@ -158,16 +159,72 @@ def profile_view(request):
 
     profile_image_url = None
     try:
-        if profile.profile_image:  # Verifica si hay un archivo asociado a profile_image
+        if profile.profile_image:
             profile_image_url = profile.profile_image.url
     except AttributeError:
         pass
 
+    artworks = Artwork.objects.order_by('created_at')
+    saved_artwork = SavedArtwork.objects.order_by('saved_at')
+
     context = {
         'profile': profile,
-        'profile_image_url': profile_image_url
+        'profile_image_url': profile_image_url,
+        'artworks': artworks,
+        'saved_artwork': saved_artwork
     }
     return render(request, 'profile.html', context)
+
+@login_required
+def artwork_upload(request):
+    if request.method == 'POST':
+        form = ArtworkForm(request.POST, request.FILES)
+        if form.is_valid():
+            artwork = form.save(commit=False)
+            artwork.user = request.user
+            artwork.save()
+            return redirect('profile_view')
+    else:
+        form = ArtworkForm()
+    return render(request, 'artwork_upload.html', {'form': form})
+
+@login_required
+@require_POST
+def save_artwork(request):
+    artwork_id = request.POST.get('artwork_id')
+    artwork = get_object_or_404(Artwork, id=artwork_id)
+    user = request.user
+    saved_artwork, created = SavedArtwork.objects.get_or_create(user=user, artwork=artwork)
+    if created:
+        messages.success(request, 'La obra de arte se ha guardado con éxito.')
+    else:
+        messages.warning(request, 'Ya ha guardado esta obra de arte.')
+
+    return redirect('profile_view')
+
+@login_required
+def artwork_detail(request, pk):
+    artwork = Artwork.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user.profile
+            message.receiver = artwork.artist
+            message.artwork = artwork
+            message.save()
+            # Redirigir al usuario a la página de detalle de la obra de arte con un mensaje de confirmación
+            return redirect('artwork_detail', pk=pk)
+
+    else:
+        form = MessageForm(initial={'receiver': artwork.artist.id})
+
+    # Renderizar la plantilla con los datos necesarios
+    context = {'artwork': artwork, 'form': form}
+    return render(request, 'artwork_detail.html', context)
+
+
 
 
 @login_required 
@@ -207,31 +264,6 @@ def send_message(request, pk):
         form = MessageForm()
     return render(request, 'send_message.html', {'form': form})
 
-@login_required
-def artwork_upload(request):
-    if request.method == 'POST':
-        form = ArtworkForm(request.POST, request.FILES)
-        if form.is_valid():
-            artwork = form.save(commit=False)
-            artwork.user = request.user
-            artwork.save()
-            return redirect('profile_view')  # Redirigir a la página de perfil después de guardar la obra de arte
-    else:
-        form = ArtworkForm()
-    return render(request, 'artwork_upload.html', {'form': form})
-
-@login_required
-@require_POST
-def save_artwork(request, pk):
-    artwork = Artwork.objects.get(pk=pk)
-    user = request.user
-
-    # Crea una nueva instancia de SavedArtwork si el usuario aún no ha guardado la obra de arte
-    if not SavedArtwork.objects.filter(user=user, artwork=artwork).exists():
-        saved_artwork = SavedArtwork.objects.create(user=user, artwork=artwork)
-        return redirect('profile_view')  # Redirigir a la página de perfil después de guardar la obra de arte
-    else:
-        return HttpResponse('Ya ha guardado esta obra de arte')
 
 
 purchase = None 
@@ -286,27 +318,7 @@ def copy_link(request, id):
     full_url = request.build_absolute_uri(reverse('artwork_detail', args=[id]))
     return HttpResponse('Enlace copiado correctamente')
 
-@login_required
-def artwork_detail(request, pk):
-    artwork = Artwork.objects.get(pk=pk)
 
-    if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
-            message.sender = request.user.profile
-            message.receiver = artwork.artist
-            message.artwork = artwork
-            message.save()
-            # Redirigir al usuario a la página de detalle de la obra de arte con un mensaje de confirmación
-            return redirect('artwork_detail', pk=pk)
-
-    else:
-        form = MessageForm(initial={'receiver': artwork.artist.id})
-
-    # Renderizar la plantilla con los datos necesarios
-    context = {'artwork': artwork, 'form': form}
-    return render(request, 'artwork_detail.html', context)
 
 def update_profile_view(request):
     profile = get_object_or_404(Profile, user=request.user)

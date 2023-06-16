@@ -11,7 +11,7 @@ Nombre del Proyecto:
 
 Proyecto de Desarrollo Web con Django: "La Galería Rosa"
 
-Este proyecto es una aplicación web desarrollada con Django, un framework de Python para desarrollo web. La aplicación muestra obras de arte disponibles y permite a los usuarios comprar las obras seleccionadas. A continuación se muestra el orden en el que se prueban las funcionalidades del proyecto:
+Este proyecto es una aplicación web desarrollada con Django, un framework de Python para desarrollo web. La aplicación muestra obras de arte disponibles y permite a los usuarios publicar, comprar o compartirlas. A continuación se muestra el orden en el que se prueban las funcionalidades del proyecto:
 
 Para comenzar, el siguiente enlace: http://127.0.0.1:8000/. muestra una página de presentación donde se visualizara debajo del nombre de la pagina un botón de una rosa que tiene la funcion de redirigir a los futuros usuarios hacia la pagina principal.
 
@@ -42,7 +42,7 @@ repositorio https://github.com/antu2809/ProyectoFinalAlmonacid
 
 Video Demostración
 
-
+https://drive.google.com/file/d/1sXCLlvihNrJBFJB-zF5-K2G53kHjUWla/view?usp=sharing
 
 
 

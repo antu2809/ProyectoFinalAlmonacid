@@ -317,8 +317,8 @@
 
                <!-- Agrega una nueva fila con las obras de arte guardadas por el usuario -->
                <div class="row">
-                    {% for saved_artwork in saved_artworks %}
-                    <div class="col-md-4">
+                    {% for saved_artwork in saved_artwork %}
+                    <div class="col-md-100">
                       <div class="card" style="background-color: transparent;">
                             <img src="{{ saved_artwork.artwork.image.url }}" class="card-img-top" alt="{{ saved_artwork.artwork.title }}">
                             <div class="card-body">
