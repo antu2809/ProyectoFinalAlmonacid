@@ -1,7 +1,12 @@
 Proyecto Final Coder House - Python
+
 Comisión: 40445
+
 Alumno: Francisco Antu Almonacid Cammarata 
-Nombre del Proyecto
+
+
+Nombre del Proyecto:
+
 "La Galería Rosa"
 
 Proyecto de Desarrollo Web con Django: "La Galería Rosa"
